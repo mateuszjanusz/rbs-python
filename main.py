@@ -5,7 +5,7 @@
 
 # Main Method
 def RBS(goal, rules, working_memory):
-	print("\nGOAL:", goal)
+	print("\nGOAL Hypothesis:", goal)
 	print("\nWorking Memory: ", working_memory, '\n')
 
 	rules = breakDownRules(rules) 
@@ -14,11 +14,11 @@ def RBS(goal, rules, working_memory):
 
 
 	if(proved):
-		print("\n Hypothesis is TRUE, the goal [",  goal, "] has been proved")
+		print("\n Hypothesis is TRUE, the goal [",  goal, "] has been proved.")
 		print(" Final Working Memory: ", working_memory)
 		return True
 	else:
-		print("\n Hypothesis is FALSE, no proof found for the goal [",  goal, "]")
+		print("\n Hypothesis is FALSE, no proof found for the goal [",  goal, "].")
 		print(" Final Working Memory: ", working_memory)
 		return False
 
@@ -26,12 +26,12 @@ def RBS(goal, rules, working_memory):
 
 # Recursive Backward Chaining Algorithm
 def backwardChaining(goal, rules, working_memory, path=[]):
-	print("\nStarting Backward Chaining for Goal [", goal, "]")
+	print("\nGoal Hypothesis [", goal, "]")
 	path.append(goal)
 	print("Matching Goal [", goal,"] in Working Memory", working_memory)
 	for fact in working_memory:
 		if(goal == fact):
-			print("GOAL PROVED!  The goal [", goal,"] is fact")
+			print("GOAL PROVED!  The goal [", goal,"] found in Working Memory")
 			return True
 	print('Goal not found in Working Memory, matching Rule Consequents.. \n.\n.')
 	print("path:", path)
@@ -41,13 +41,13 @@ def backwardChaining(goal, rules, working_memory, path=[]):
 
 # Match Method for matching goal with a consequent
 def match(goal, rules, working_memory):
-	for consequent in rules:
+	for index, consequent in enumerate(rules):
 
 		if consequent == goal:
 			# SELECT this Rule
 			antecedent = rules[consequent]
-			print(".\nMATCH! Goal [", goal, "] matches Consequent in Rule >> IF", antecedent, "THEN", consequent)
-			print("Antecedent [", antecedent, "] is new Subgoal")
+			print(".\nMATCH! Goal [", goal, "] matches Consequent in Rule", index+1, ": IF", antecedent, "THEN", consequent)
+			# print("Antecedent [", antecedent, "] is new Subgoal")
 			return matchAntecedents(antecedent, rules, working_memory)	
 
 	print('Goal not found in Consequents. Proof not found.')
@@ -58,17 +58,17 @@ def match(goal, rules, working_memory):
 def matchAntecedents(antecedent, rules, working_memory):
 	# multiple AND facts (all must be true)
 	if "&" in antecedent:
-		print(" Multiple AND antecedents [", antecedent, "]")
+		print("NEW SUBGOAL: Multiple AND antecedents that have to be proven are [", antecedent, "]")
 		all_antecedents = antecedent.split('&')
 		for (i, a) in enumerate(all_antecedents):
 			a = a.strip()
-			print("*** Proving", i+1, "antecedent [", a, "] of [", antecedent, "] ***")
+			print("*** Proving antecedent", i+1, "[", a, "] from [", antecedent, "] ***")
 			proved = backwardChaining(a, rules, working_memory)
 			if proved == True:
-				print("[", a, "] proved", proved)
+				print(">> Subgoal [", a, "] proved", proved)
 				addFact(working_memory, a)
 			else:
-				print("[", a, "] proved", proved)
+				print(">> Subgoal [", a, "] proved", proved)
 				return False
 
 		print("***  All antecedents from [", antecedent, "] proved TRUE ***")
@@ -76,14 +76,14 @@ def matchAntecedents(antecedent, rules, working_memory):
 
 	# multiple OR facts (at least one needs to be true)
 	if "OR" in antecedent:
-		print(" Multiple OR antecedents [", antecedent, "]")
+		print("NEW SUBGOAL: Multiple OR antecedents that have to be proven are [", antecedent, "]")
 		all_antecedents = antecedent.split('OR')
 		for (i, a) in enumerate(all_antecedents):
 			a = a.strip()
-			print("Proving", i+1, "antecedent [", a, "] of [", antecedent, "]")
+			print("Proving antecedent", i+1, "[", a, "] from [", antecedent, "]")
 			proved = backwardChaining(a, rules, working_memory)
 			if proved == True:
-				print("[", a, "] proved TRUE")
+				print(">> Subgoal [", a, "] proved TRUE")
 				addFact(working_memory, a)
 				return True
 
@@ -92,10 +92,10 @@ def matchAntecedents(antecedent, rules, working_memory):
 
 	# antecedent is only one fact that must be true	
 	else:
-		print("Proving antecedent [", antecedent, "]")
+		print("NEW SUBGOAL: antecedent that have to be proven is [", antecedent, "]")
 		proved = backwardChaining(antecedent, rules, working_memory)
 		if proved == True: 
-			print("[", antecedent, "] proved TRUE")
+			print(">> Subgoal [", antecedent, "] proved TRUE")
 			addFact(working_memory, antecedent)
 			return True
 		else:
